@@ -1,8 +1,7 @@
 /* eslint-disable no-undef */
-import {assert, expect} from 'chai';
+import { assert, expect } from 'chai';
 import Validator from '../../src/Services/Validator';
 import Node from '../../src/Node';
-import { ERROR_VALIDATION } from '../../src/ValidationError';
 
 
 describe('Services/Validator.js', () => {
@@ -31,10 +30,10 @@ describe('Services/Validator.js', () => {
                         expect(false).to.equal(true, 'Should fail validation');
                     })
                     .catch(e => {
-                        expect(e.message).to.equal(ERROR_VALIDATION);
-                        expect(e.details).to.be.an('object');
-                        expect(e.details.value).to.be.an('array');
-                    })
+                        expect(e.name).to.equal('ValidationError');
+                        expect(e.details).to.be.an('array');
+                        expect(e.details[0]).to.be.an('object');
+                    });
             });
         });
 
@@ -56,11 +55,11 @@ describe('Services/Validator.js', () => {
                         expect(false).to.equal(true, 'Should fail validation');
                     })
                     .catch(e => {
-                        expect(e.message).to.equal(ERROR_VALIDATION);
-                        expect(e.details).to.be.an('object');
-                        expect(e.details).contains.key('required');
-                        expect(e.details).not.contains.key('notRequired');
-                    })
+                        expect(e.name).to.equal('ValidationError');
+                        expect(e.details).to.be.an('array');
+                        expect(e.details[0]).to.be.an('object');
+                        expect(e.details[0].type).equal('any.required');
+                    });
             });
         });
 
@@ -97,8 +96,10 @@ describe('Services/Validator.js', () => {
                         assert(false, 'value should be forbidden');
                     })
                     .catch(e => {
-                        expect(e.message).to.equal(ERROR_VALIDATION);
-                        expect(e.details).to.be.an('object');
+                        console.log(e);
+                        expect(e.name).to.equal('ValidationError');
+                        expect(e.details).to.be.an('array');
+                        expect(e.details[0]).to.be.an('object');
                         expect(e.details).contains.key('value');
                     });
             });
@@ -130,7 +131,7 @@ describe('Services/Validator.js', () => {
                 const model = instance.model('ValidatorTest', {
                     falsy: {
                         type: 'boolean',
-                        falsy: [ 'no' ],
+                        falsy: ['no'],
                     },
                 });
 
@@ -149,7 +150,7 @@ describe('Services/Validator.js', () => {
                 const model = instance.model('ValidatorTest', {
                     truthy: {
                         type: 'boolean',
-                        truthy: [ 'yes' ],
+                        truthy: ['yes'],
                     },
                 });
 
@@ -168,7 +169,7 @@ describe('Services/Validator.js', () => {
                 const model = instance.model('ValidatorTest', {
                     truthy: {
                         type: 'boolean',
-                        truthy: [ 'Y' ],
+                        truthy: ['Y'],
                     },
                 });
 
@@ -239,7 +240,7 @@ describe('Services/Validator.js', () => {
                     Validator(instance, model, { date: '2019-01-01' })
                         .then(res => {
                             expect(res.date).to.be.an.instanceOf(Date);
-                            expect( res.date.getTime() ).to.equal( new Date('2019-01-01').getTime() );
+                            expect(res.date.getTime()).to.equal(new Date('2019-01-01').getTime());
                         })
                         .catch(e => {
                             expect(false, e.message);
@@ -259,7 +260,7 @@ describe('Services/Validator.js', () => {
                     Validator(instance, model, { date })
                         .then(res => {
                             expect(res.date).to.be.an.instanceOf(Date);
-                            expect(res.date.getTime()).to.equal( date.getTime() );
+                            expect(res.date.getTime()).to.equal(date.getTime());
                         })
                         .catch(e => {
                             expect(false, e.message);
@@ -313,7 +314,7 @@ describe('Services/Validator.js', () => {
                     Validator(instance, model, { date: '2019-01-01' })
                         .then(res => {
                             expect(res.date).to.be.an.instanceOf(Date);
-                            expect( res.date.getTime() ).to.equal( new Date('2019-01-01').getTime() );
+                            expect(res.date.getTime()).to.equal(new Date('2019-01-01').getTime());
                         })
                         .catch(e => {
                             expect(false, e.message);
@@ -333,7 +334,7 @@ describe('Services/Validator.js', () => {
                     Validator(instance, model, { date })
                         .then(res => {
                             expect(res.date).to.be.an.instanceOf(Date);
-                            expect(res.date.getTime()).to.equal( date.getTime() );
+                            expect(res.date.getTime()).to.equal(date.getTime());
                         })
                         .catch(e => {
                             expect(false, e.message);
@@ -609,7 +610,7 @@ describe('Services/Validator.js', () => {
                     email: {
                         type: 'string',
                         email: {
-                            tldWhitelist: ['com'],
+                            'tlds.allow': ['com'],
                         },
                     },
                 });
@@ -683,7 +684,7 @@ describe('Services/Validator.js', () => {
                 },
             });
 
-            Validator(instance, model, { node: {id: 'invalid'} })
+            Validator(instance, model, { node: { id: 'invalid' } })
                 .then(res => {
                     assert(true);
                 })
@@ -708,7 +709,7 @@ describe('Services/Validator.js', () => {
                 });
         });
     });
-    
+
     describe('Relationships', () => {
         it('should accept a string', () => {
             const model = instance.model('ValidatorTest', {
@@ -724,7 +725,7 @@ describe('Services/Validator.js', () => {
                 relationship: {
                     prop: 'value',
                     node: '1234',
-                }   
+                }
             })
                 .then(res => {
                     assert(true);
@@ -748,8 +749,8 @@ describe('Services/Validator.js', () => {
             Validator(instance, model, {
                 relationship: {
                     prop: 'value',
-                    alias: '1234', 
-                }   
+                    alias: '1234',
+                }
             })
                 .then(() => {
                     assert(true);
@@ -769,7 +770,7 @@ describe('Services/Validator.js', () => {
                 },
             });
 
-            Validator(instance, model, { node: {id: 'alias'} })
+            Validator(instance, model, { node: { id: 'alias' } })
                 .then(() => {
                     assert(true);
                 })
@@ -789,7 +790,7 @@ describe('Services/Validator.js', () => {
                 },
             });
 
-            Validator(instance, model, { node: {id: 'alias'} })
+            Validator(instance, model, { node: { id: 'alias' } })
                 .then(() => {
                     assert(true);
                 })
@@ -808,7 +809,7 @@ describe('Services/Validator.js', () => {
                 },
             });
 
-            Validator(instance, model, { relationship: {prop: 'value', node: new Node }})
+            Validator(instance, model, { relationship: { prop: 'value', node: new Node } })
                 .then(res => {
                     assert(true);
                 })
@@ -827,7 +828,7 @@ describe('Services/Validator.js', () => {
                 },
             });
 
-            Validator(instance, model, { relationship: {prop: 'value', node: new Node }})
+            Validator(instance, model, { relationship: { prop: 'value', node: new Node } })
                 .then(res => {
                     assert(true);
                 })

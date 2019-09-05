@@ -1,5 +1,4 @@
-import Builder, {mode} from '../Query/Builder';
-import {eager} from '../Factory';
+import Builder, { mode } from '../Query/Builder';
 
 export const MAX_EAGER_DEPTH = 10;
 
@@ -15,11 +14,11 @@ export const MAX_EAGER_DEPTH = 10;
  * @param {Integer}          to_depth       Maximum depth to delete to
  */
 function addCascadeDeleteNode(neode, builder, from_alias, relationship, aliases, to_depth) {
-    if ( aliases.length > to_depth ) return;
+    if (aliases.length > to_depth) return;
 
     const rel_alias = from_alias + relationship.name() + '_rel';
     const node_alias = from_alias + relationship.name() + '_node';
-    const target = neode.model( relationship.target() );
+    const target = neode.model(relationship.target());
 
     // Optional Match
     builder.optionalMatch(from_alias)
@@ -28,7 +27,7 @@ function addCascadeDeleteNode(neode, builder, from_alias, relationship, aliases,
 
     // Check for cascade deletions
     target.relationships().forEach(relationship => {
-        switch ( relationship.cascade() ) {
+        switch (relationship.cascade()) {
             case 'delete':
                 addCascadeDeleteNode(neode, builder, node_alias, relationship, aliases.concat(node_alias), to_depth);
                 break;
@@ -76,9 +75,7 @@ function addDetachNode(neode, builder, from_alias, relationship, aliases) {
  */
 export default function DeleteNode(neode, identity, model, to_depth = MAX_EAGER_DEPTH) {
     const alias = 'this';
-    const to_delete = [];
     const aliases = [alias];
-    const depth = 1;
 
     const builder = (new Builder(neode))
         .match(alias, model)
@@ -86,7 +83,7 @@ export default function DeleteNode(neode, identity, model, to_depth = MAX_EAGER_
 
     // Cascade delete to relationships
     model.relationships().forEach(relationship => {
-        switch ( relationship.cascade() ) {
+        switch (relationship.cascade()) {
             case 'delete':
                 addCascadeDeleteNode(neode, builder, alias, relationship, aliases, to_depth);
                 break;

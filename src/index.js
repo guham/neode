@@ -64,18 +64,18 @@ export default class Neode {
         };
 
         Object.keys(settings).forEach(setting => {
-            if ( process.env.hasOwnProperty(setting) ) {
-                const key = settings[ setting ];
-                let value = process.env[ setting ];
+            if (process.env.hasOwnProperty(setting)) {
+                const key = settings[setting];
+                let value = process.env[setting];
 
-                if ( key == "trustedCertificates" ) {
+                if (key == "trustedCertificates") {
                     value = value.split(',');
                 }
-                else if ( key == "disableLosslessIntegers" ) {
+                else if (key == "disableLosslessIntegers") {
                     value = value === 'true';
                 }
 
-                config[ key ] = value;
+                config[key] = value;
             }
         });
 
@@ -90,7 +90,7 @@ export default class Neode {
      */
     with(models) {
         Object.keys(models).forEach(model => {
-            this.model(model, models[ model ]);
+            this.model(model, models[model]);
         });
 
         return this;
@@ -108,7 +108,7 @@ export default class Neode {
         files.filter(file => path.extname(file).toLowerCase() === '.js')
             .forEach(file => {
                 const model = file.replace('.js', '');
-                const path = directory +'/'+ file;
+                const path = directory + '/' + file;
                 const schema = require("" + path);
 
                 return this.model(model, schema);
@@ -143,7 +143,7 @@ export default class Neode {
      * @return {Model}
      */
     model(name, schema) {
-        if ( schema instanceof Object) {
+        if (schema instanceof Object) {
             const model = new Model(this, name, schema);
             this.models.set(name, model);
         }
@@ -265,20 +265,20 @@ export default class Neode {
     cypher(query, params, session = false) {
         // If single run, open a new session
         const single = !session;
-        if ( single ) {
+        if (single) {
             session = this.session();
         }
 
         return session.run(query, params)
             .then(res => {
-                if ( single ) {
+                if (single) {
                     session.close();
                 }
 
                 return res;
             })
             .catch(err => {
-                if ( single ) {
+                if (single) {
                     session.close();
                 }
 
@@ -358,11 +358,11 @@ export default class Neode {
                         output.push(res);
                     })
                     .catch(error => {
-                        errors.push({query, params, error});
+                        errors.push({ query, params, error });
                     });
             }
             catch (error) {
-                errors.push({query, params, error});
+                errors.push({ query, params, error });
             }
         }))
             .then(() => {

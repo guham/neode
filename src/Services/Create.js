@@ -1,6 +1,6 @@
 import GenerateDefaultValues from './GenerateDefaultValues';
 import Validator from './Validator';
-import Builder, {mode} from '../Query/Builder';
+import Builder, { mode } from '../Query/Builder';
 import { eagerNode, } from '../Query/EagerUtils';
 import { addNodeToStatement, ORIGINAL_ALIAS } from './WriteUtils';
 
@@ -12,7 +12,7 @@ export default function Create(neode, model, properties) {
 
             const builder = new Builder(neode);
 
-            addNodeToStatement(neode, builder, alias, model, properties, [ alias ]);
+            addNodeToStatement(neode, builder, alias, model, properties, [alias]);
 
             // Output
             const output = eagerNode(neode, 1, alias, model);

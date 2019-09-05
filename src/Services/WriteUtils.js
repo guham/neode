@@ -25,35 +25,35 @@ function splitProperties(mode, model, properties, merge_on = []) {
         const name = property.name();
 
         // Skip if not set
-        if ( !properties.hasOwnProperty(name) ) {
+        if (!properties.hasOwnProperty(name)) {
             return;
         }
 
-        const value = valueToCypher( property, properties[ name ] );
+        const value = valueToCypher(property, properties[name]);
 
         // If mode is create, go ahead and set everything
-        if ( mode == 'create' ) {
-            inline[ name ] = value;
+        if (mode == 'create') {
+            inline[name] = value;
         }
 
-        else if ( merge_on.indexOf( name ) > -1 ) {
-            inline[ name ] = value;
+        else if (merge_on.indexOf(name) > -1) {
+            inline[name] = value;
         }
 
         // Only set protected properties on creation
-        else if ( property.protected() || property.primary() ) {
-            on_create[ name ] = value;
+        else if (property.protected() || property.primary()) {
+            on_create[name] = value;
         }
 
         // Read-only property?
-        else if ( !property.readonly() ) {
-            set[ name ] = value;
+        else if (!property.readonly()) {
+            set[name] = value;
         }
     });
 
     return {
-        inline, 
-        on_create, 
+        inline,
+        on_create,
         on_match,
         set,
     };
@@ -77,7 +77,7 @@ export function addNodeToStatement(neode, builder, alias, model, properties, ali
     const { inline, on_create, on_match, set } = splitProperties(mode, model, properties, merge_on);
 
     // Add alias
-    if ( aliases.indexOf(alias) == -1 ) {
+    if (aliases.indexOf(alias) == -1) {
         aliases.push(alias);
     }
 
@@ -85,30 +85,30 @@ export function addNodeToStatement(neode, builder, alias, model, properties, ali
     builder[mode](alias, model, inline);
 
     // On create set
-    if ( Object.keys( on_create ).length ) {
-        Object.entries( on_create ).forEach(( [key, value] ) => {
+    if (Object.keys(on_create).length) {
+        Object.entries(on_create).forEach(([key, value]) => {
             builder.onCreateSet(`${alias}.${key}`, value);
         });
     }
 
     // On Match Set
-    if ( Object.keys( on_match ).length ) {
-        Object.entries( on_match ).forEach(( [key, value] ) => {
+    if (Object.keys(on_match).length) {
+        Object.entries(on_match).forEach(([key, value]) => {
             builder.onCreateSet(`${alias}.${key}`, value);
         });
     }
 
     // Set
-    if ( Object.keys( set ).length ) {
-        Object.entries( set ).forEach(( [key, value] ) => {
+    if (Object.keys(set).length) {
+        Object.entries(set).forEach(([key, value]) => {
             builder.set(`${alias}.${key}`, value);
         });
     }
 
     // Relationships
     model.relationships().forEach((relationship, key) => {
-        if ( properties.hasOwnProperty(key) ) {
-            let value = properties[ key ];
+        if (properties.hasOwnProperty(key)) {
+            let value = properties[key];
 
             const rel_alias = `${alias}_${key}_rel`;
             const target_alias = `${alias}_${key}_node`;
@@ -116,14 +116,14 @@ export function addNodeToStatement(neode, builder, alias, model, properties, ali
             // Carry alias through
             builder.with(...aliases);
 
-            if ( ! relationship.target() ) {
-                throw new Error(`A target defintion must be defined for ${key} on model ${model.name()}`)
+            if (!relationship.target()) {
+                throw new Error(`A target defintion must be defined for ${key} on model ${model.name()}`);
             }
-            else if ( Array.isArray( relationship.target() ) ) {
+            else if (Array.isArray(relationship.target())) {
                 throw new Error(`You cannot create a node with the ambiguous relationship: ${key} on model ${model.name()}`);
             }
 
-            switch ( relationship.type() ) {
+            switch (relationship.type()) {
                 // Single Relationship
                 case 'relationship':
                     addRelationshipToStatement(neode, builder, alias, rel_alias, target_alias, relationship, value, aliases, mode);
@@ -131,7 +131,7 @@ export function addNodeToStatement(neode, builder, alias, model, properties, ali
 
                 // Array of Relationships
                 case 'relationships':
-                    if ( !Array.isArray(value) ) value = [ value ];
+                    if (!Array.isArray(value)) value = [value];
 
                     value.forEach((value, idx) => {
                         // Carry alias through
@@ -146,7 +146,7 @@ export function addNodeToStatement(neode, builder, alias, model, properties, ali
 
                 // Array of Nodes
                 case 'nodes':
-                    if ( !Array.isArray(value) ) value = [ value ];
+                    if (!Array.isArray(value)) value = [value];
 
                     value.forEach((value, idx) => {
                         addNodeRelationshipToStatement(neode, builder, alias, rel_alias + idx, target_alias + idx, relationship, value, aliases, mode);
@@ -173,36 +173,36 @@ export function addNodeToStatement(neode, builder, alias, model, properties, ali
  * @param {String}          mode        'create' or 'merge'
  */
 export function addRelationshipToStatement(neode, builder, alias, rel_alias, target_alias, relationship, value, aliases, mode) {
-    if ( aliases.length > MAX_CREATE_DEPTH ) {
+    if (aliases.length > MAX_CREATE_DEPTH) {
         return;
     }
 
     // Extract Node
     const node_alias = relationship.nodeAlias();
-    let node_value = value[ node_alias ];
+    let node_value = value[node_alias];
 
-    delete value[ node_alias ];
+    delete value[node_alias];
 
     // Create Node
 
     // If Node is passed, attempt to create a relationship to that specific node
-    if ( node_value instanceof Node ) {
+    if (node_value instanceof Node) {
         builder.match(target_alias)
             .whereId(target_alias, node_value.identity());
     }
 
     // If Primary key is passed then try to match on that
-    else if ( typeof node_value == 'string' || typeof node_value == 'number' ) {
-        const model = neode.model( relationship.target() );
+    else if (typeof node_value == 'string' || typeof node_value == 'number') {
+        const model = neode.model(relationship.target());
 
         builder.merge(target_alias, model, {
-            [ model.primaryKey() ]: node_value
+            [model.primaryKey()]: node_value
         });
     }
 
     // If Map is passed, attempt to create that node and then relate
-    else if ( Object.keys(node_value).length ) {
-        const model = neode.model( relationship.target() );
+    else if (Object.keys(node_value).length) {
+        const model = neode.model(relationship.target());
         node_value = GenerateDefaultValues.async(neode, model, node_value);
 
         addNodeToStatement(neode, builder, target_alias, model, node_value, aliases, mode, model.mergeFields());
@@ -210,15 +210,15 @@ export function addRelationshipToStatement(neode, builder, alias, rel_alias, tar
 
     // Create the Relationship
     builder[mode](alias)
-        .relationship( relationship.relationship(), relationship.direction(), rel_alias )
+        .relationship(relationship.relationship(), relationship.direction(), rel_alias)
         .to(target_alias);
 
     // Set Relationship Properties
     relationship.properties().forEach(property => {
         const name = property.name();
 
-        if ( value.hasOwnProperty( name ) ) {
-            builder.set(`${rel_alias}.${name}`, value[ name ] );
+        if (value.hasOwnProperty(name)) {
+            builder.set(`${rel_alias}.${name}`, value[name]);
         }
     });
 }
@@ -237,35 +237,35 @@ export function addRelationshipToStatement(neode, builder, alias, rel_alias, tar
  * @param {String}  mode        'create' or 'merge'
  */
 export function addNodeRelationshipToStatement(neode, builder, alias, rel_alias, target_alias, relationship, value, aliases, mode) {
-    if ( aliases.length > MAX_CREATE_DEPTH ) {
+    if (aliases.length > MAX_CREATE_DEPTH) {
         return;
     }
 
     // If Node is passed, attempt to create a relationship to that specific node
-    if ( value instanceof Node ) {
+    if (value instanceof Node) {
         builder.match(target_alias)
             .whereId(target_alias, value.identity());
     }
     // If Primary key is passed then try to match on that
-    else if ( typeof value == 'string' || typeof value == 'number' ) {
-        const model = neode.model( relationship.target() );
+    else if (typeof value == 'string' || typeof value == 'number') {
+        const model = neode.model(relationship.target());
 
         builder.merge(target_alias, model, {
-            [ model.primaryKey() ]: value
+            [model.primaryKey()]: value
         });
     }
     // If Map is passed, attempt to create that node and then relate
     // TODO: What happens when we need to validate this?
     // TODO: Is mergeFields() the right option here?
-    else if ( Object.keys(value).length ) {
-        const model = neode.model( relationship.target() );
+    else if (Object.keys(value).length) {
+        const model = neode.model(relationship.target());
         value = GenerateDefaultValues.async(neode, model, value);
 
         addNodeToStatement(neode, builder, target_alias, model, value, aliases, mode, model.mergeFields());
     }
-    
+
     // Create the Relationship
     builder[mode](alias)
-        .relationship( relationship.relationship(), relationship.direction(), rel_alias )
+        .relationship(relationship.relationship(), relationship.direction(), rel_alias)
         .to(target_alias);
 }

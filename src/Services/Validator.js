@@ -3,12 +3,11 @@ import Joi from '@hapi/joi';
 import Model from '../Model';
 import Node from '../Node';
 import RelationshipType, { DEFAULT_ALIAS } from '../RelationshipType';
-import ValidationError from '../ValidationError';
 import { v1 as neo4j } from 'neo4j-driver';
 
 const joi_options = {
-    allowUnknown:true,
-    abortEarly:false
+    allowUnknown: true,
+    abortEarly: false
 };
 
 const ignore = ['type', 'default'];
@@ -59,11 +58,11 @@ const temporal = Joi.extend({
                 ]),
             },
             validate(params, value, state, options) {
-                if ( params.after === 'now' ) {
+                if (params.after === 'now') {
                     params.after = new Date();
                 }
 
-                if ( params.after > value ) {
+                if (params.after > value) {
                     return this.createError('temporal.after', { v: value }, state, options);
                 }
 
@@ -79,11 +78,11 @@ const temporal = Joi.extend({
                 ]),
             },
             validate(params, value, state, options) {
-                if ( params.after === 'now' ) {
+                if (params.after === 'now') {
                     params.after = new Date();
                 }
 
-                if ( params.after < value ) {
+                if (params.after < value) {
                     return this.createError('temporal.after', { v: value }, state, options);
                 }
 
@@ -106,14 +105,14 @@ function relationshipSchema(alias, properties = {}) {
     return Joi.object().keys(Object.assign(
         {},
         {
-            [ alias ]: nodeSchema().required(),
+            [alias]: nodeSchema().required(),
         },
         BuildValidationSchema(properties)
     ));
 }
 
 function BuildValidationSchema(schema) {
-    if ( schema instanceof Model || schema instanceof RelationshipType ) {
+    if (schema instanceof Model || schema instanceof RelationshipType) {
         schema = schema.schema();
     }
 
@@ -122,7 +121,7 @@ function BuildValidationSchema(schema) {
     // console.log('??', schema);
 
     Object.keys(schema).forEach(key => {
-        const config = typeof schema[ key ] == 'string' ? {type: schema[ key ]} : schema[ key ];
+        const config = typeof schema[key] == 'string' ? { type: schema[key] } : schema[key];
 
         let validation = false;
 
@@ -155,7 +154,7 @@ function BuildValidationSchema(schema) {
             case 'string':
             case 'number':
             case 'boolean':
-                validation = Joi[ config.type ]();
+                validation = Joi[config.type]();
                 break;
 
             case 'datetime':
@@ -180,7 +179,8 @@ function BuildValidationSchema(schema) {
 
             case 'int':
             case 'integer':
-                validation = Joi.number().integer();
+                // todo: Joi.object() or Joi.number()
+                validation = Joi.any();
                 break;
 
             case 'float':
@@ -192,7 +192,7 @@ function BuildValidationSchema(schema) {
                 break;
         }
 
-        if ( ! config.required ) {
+        if (!config.required) {
             validation = validation.allow(null);
         }
 
@@ -200,8 +200,8 @@ function BuildValidationSchema(schema) {
         Object.keys(config).forEach(validator => {
             const options = config[validator];
 
-            if ( validator == 'regex' ) {
-                if ( options instanceof RegExp ) {
+            if (validator == 'regex') {
+                if (options instanceof RegExp) {
                     validation = validation.regex(options);
                 }
                 else {
@@ -211,20 +211,20 @@ function BuildValidationSchema(schema) {
                     validation = validation.regex(pattern, options);
                 }
             }
-            else if ( validator == 'replace' ) {
+            else if (validator == 'replace') {
                 validation = validation.replace(options.pattern, options.replace);
             }
-            else if ( booleanOrOptions.indexOf(validator) > -1 ) {
-                if ( typeof options == 'object' ) {
-                    validation = validation[ validator ](options);
+            else if (booleanOrOptions.indexOf(validator) > -1) {
+                if (typeof options == 'object') {
+                    validation = validation[validator](options);
                 }
-                else if ( options ) {
-                    validation = validation[ validator ]();
+                else if (options) {
+                    validation = validation[validator]();
                 }
             }
-            else if ( booleans.indexOf(validator) > -1 ) {
-                if ( options === true ) {
-                    validation = validation[ validator ](options);
+            else if (booleans.indexOf(validator) > -1) {
+                if (options === true) {
+                    validation = validation[validator](options);
                 }
             }
             else if (ignore.indexOf(validator) == -1 && validation[validator]) {
@@ -232,7 +232,7 @@ function BuildValidationSchema(schema) {
             }
         });
 
-        output[ key ] = validation;
+        output[key] = validation;
     });
 
     return output;

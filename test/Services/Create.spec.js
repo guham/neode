@@ -1,4 +1,4 @@
-import {assert, expect} from 'chai';
+import { assert, expect } from 'chai';
 import Create from '../../src/Services/Create';
 import Node from '../../src/Node';
 
@@ -18,7 +18,9 @@ describe('Services/Create.js', () => {
             type: 'string',
             required: true,
         },
-        age: 'integer',
+        age: {
+            type: 'int',
+        },
         enabled: {
             type: 'boolean',
             default: false,
@@ -33,7 +35,6 @@ describe('Services/Create.js', () => {
             relationship: 'RELATIONSHIP',
             target: label,
             direction: 'out',
-            properties: {},
             eager: true,
             alias: 'otherEnd',
             properties: {
@@ -48,7 +49,6 @@ describe('Services/Create.js', () => {
             relationship: 'THEN_TO',
             target: label,
             direction: 'out',
-            properties: {},
             eager: true,
             alias: 'leaf',
             properties: {
@@ -56,7 +56,7 @@ describe('Services/Create.js', () => {
                     type: 'int',
                     default: Date.now
                 }
-            }, 
+            },
         },
         relationships: {
             type: 'relationships',
@@ -95,7 +95,7 @@ describe('Services/Create.js', () => {
             type: 'node',
             relationship: 'AMBIGUOUS_RELATIONSHIP',
             direction: 'out',
-            target: [ label, 'Person', 'Thing' ],
+            target: [label, 'Person', 'Thing'],
         },
     };
 
@@ -137,10 +137,10 @@ describe('Services/Create.js', () => {
                 Create(instance, model, data)
                     .then(res => {
                         expect(res).to.be.an.instanceOf(Node);
-                        expect( res.get('name') ).to.equal(data.name);
-                        expect( res.get('enabled') ).to.equal(false);
-                        expect( res.get('age').toInt()) .to.equal(data.age);
-                        assert( res.get('uuid').match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i) )
+                        expect(res.get('name')).to.equal(data.name);
+                        expect(res.get('enabled')).to.equal(false);
+                        expect(res.get('age').toInt()).to.equal(data.age);
+                        assert(res.get('uuid').match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i));
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -158,8 +158,8 @@ describe('Services/Create.js', () => {
                             node: end_node
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('node').get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('node').get('name')).to.equal(name)
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -176,8 +176,8 @@ describe('Services/Create.js', () => {
                             node: end_node.get('uuid'),
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('node').get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('node').get('name')).to.equal(name)
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -194,8 +194,8 @@ describe('Services/Create.js', () => {
 
                 Create(instance, model, data)
                     .then(res => {
-                        expect( res.get('name') ).to.equal('Start');
-                        expect( res.get('node').get('name') ).to.equal('End')
+                        expect(res.get('name')).to.equal('Start');
+                        expect(res.get('node').get('name')).to.equal('End')
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -215,7 +215,7 @@ describe('Services/Create.js', () => {
                     })
                     .catch(e => {
                         const expected = 'A target defintion must be defined for relationshipToAnything on model CreateTest';
-                        expect( e.message ).to.equal(expected);
+                        expect(e.message).to.equal(expected);
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -233,8 +233,8 @@ describe('Services/Create.js', () => {
                             nodes: [end_node]
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('nodes').first().get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('nodes').first().get('name')).to.equal(name)
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -251,8 +251,8 @@ describe('Services/Create.js', () => {
                             nodes: [end_node.get('uuid')],
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('nodes').first().get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('nodes').first().get('name')).to.equal(name)
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -269,8 +269,8 @@ describe('Services/Create.js', () => {
 
                 Create(instance, model, data)
                     .then(res => {
-                        expect( res.get('name') ).to.equal('Start');
-                        expect( res.get('nodes').first().get('name') ).to.equal('End')
+                        expect(res.get('name')).to.equal('Start');
+                        expect(res.get('nodes').first().get('name')).to.equal('End')
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -289,9 +289,9 @@ describe('Services/Create.js', () => {
 
                 Create(instance, model, data)
                     .then(res => {
-                        expect( res.get('name') ).to.equal('Start');
-                        expect( res.get('nodes').first().get('name') ).to.equal('Middle');
-                        expect( res.get('nodes').first().get('nodes').first().get('name') ).to.equal('End');
+                        expect(res.get('name')).to.equal('Start');
+                        expect(res.get('nodes').first().get('name')).to.equal('Middle');
+                        expect(res.get('nodes').first().get('nodes').first().get('name')).to.equal('End');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -312,9 +312,9 @@ describe('Services/Create.js', () => {
                             },
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('relationship').get('since') ).to.equal(100);
-                                expect( res.get('relationship').otherNode().get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('relationship').get('since')).to.equal(100);
+                                expect(res.get('relationship').otherNode().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -333,13 +333,13 @@ describe('Services/Create.js', () => {
                                 otherEnd: end_node.get('uuid'),
                             },
                         })
-                        .then(res => {
-                            expect( res.get('name') ).to.equal('Start');
-                            expect( res.get('relationship').get('since') ).to.equal(200);
-                            expect( res.get('relationship').otherNode().get('name') ).to.equal(name)
-                        })
-                        .then(() => done())
-                        .catch(e => done(e));
+                            .then(res => {
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('relationship').get('since')).to.equal(200);
+                                expect(res.get('relationship').otherNode().get('name')).to.equal(name)
+                            })
+                            .then(() => done())
+                            .catch(e => done(e));
                     });
             }).timeout(TIMEOUT);
 
@@ -371,11 +371,11 @@ describe('Services/Create.js', () => {
                         const gonna = never.get('relationship').otherNode();
                         const give = never.get('relationship').otherNode().get('relationship').otherNode();
 
-                        expect( never.get('name') ).to.equal('Never');
-                        expect( never.get('relationship').get('since') ).to.equal(300);
-                        expect( gonna.get('name') ).to.equal('gonna');
-                        expect( gonna.get('relationship').get('since') ).to.equal(400);
-                        expect( give.get('name') ).to.equal('give');
+                        expect(never.get('name')).to.equal('Never');
+                        expect(never.get('relationship').get('since')).to.equal(300);
+                        expect(gonna.get('name')).to.equal('gonna');
+                        expect(gonna.get('relationship').get('since')).to.equal(400);
+                        expect(give.get('name')).to.equal('give');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -393,11 +393,11 @@ describe('Services/Create.js', () => {
 
                 Create(instance, model, data)
                     .then(res => {
-                        assert(false, 'Should throw an exception')
+                        assert(false, 'Should throw an exception');
                     })
                     .catch(e => {
                         const expected = 'You cannot create a node with the ambiguous relationship: ambiguousRelationship on model CreateTest';
-                        expect( e.message ).to.equal(expected);
+                        expect(e.message).to.equal(expected);
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -412,18 +412,18 @@ describe('Services/Create.js', () => {
                     .then(end_node => {
                         return Create(instance, model, {
                             name: 'Start',
-                            relationships: [{ 
+                            relationships: [{
                                 since: 100,
-                                otherEnd: end_node 
+                                otherEnd: end_node
                             }]
                         })
-                        .then(res => {
-                            expect( res.get('name') ).to.equal('Start');
-                            expect( res.get('relationships').first().get('since') ).to.equal(100);
-                            expect( res.get('relationships').first().otherNode().get('name') ).to.equal(name);
-                        })
-                        .then(() => done())
-                        .catch(e => done(e));
+                            .then(res => {
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('relationships').first().get('since')).to.equal(100);
+                                expect(res.get('relationships').first().otherNode().get('name')).to.equal(name);
+                            })
+                            .then(() => done())
+                            .catch(e => done(e));
                     })
             }).timeout(TIMEOUT);
 
@@ -439,13 +439,13 @@ describe('Services/Create.js', () => {
                                 otherEnd: end_node.get('uuid'),
                             },
                         })
-                        .then(res => {
-                            expect( res.get('name') ).to.equal('Start');
-                            expect( res.get('relationships').first().get('since') ).to.equal(100);
-                            expect( res.get('relationships').first().otherNode().get('name') ).to.equal(name);
-                        })
-                        .then(() => done())
-                        .catch(e => done(e));
+                            .then(res => {
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('relationships').first().get('since')).to.equal(100);
+                                expect(res.get('relationships').first().otherNode().get('name')).to.equal(name);
+                            })
+                            .then(() => done())
+                            .catch(e => done(e));
                     });
             }).timeout(TIMEOUT);
 
@@ -457,9 +457,9 @@ describe('Services/Create.js', () => {
                         otherEnd: {
                             name: 'gonna',
                             relationships: [
-                                { since: 100, otherEnd: {name: 'give you up' }},
-                                { since: 200, otherEnd: {name: 'let you down' }},
-                                { since: 300, otherEnd: {name: 'run around and desert you' }},
+                                { since: 100, otherEnd: { name: 'give you up' } },
+                                { since: 200, otherEnd: { name: 'let you down' } },
+                                { since: 300, otherEnd: { name: 'run around and desert you' } },
                             ],
                         },
                     }],
@@ -470,13 +470,13 @@ describe('Services/Create.js', () => {
                         const gonna = never.get('relationship').otherNode();
                         const give = never.get('relationship').otherNode().get('relationship').otherNode();
 
-                        expect( never.get('name') ).to.equal('Never');
-                        expect( never.get('relationships').first().get('since') ).to.equal(300);
-                        expect( gonna.get('name') ).to.equal('gonna');
+                        expect(never.get('name')).to.equal('Never');
+                        expect(never.get('relationships').first().get('since')).to.equal(300);
+                        expect(gonna.get('name')).to.equal('gonna');
 
                         const what = gonna.get('relationships');
 
-                        expect( what.length ).to.equal(3);
+                        expect(what.length).to.equal(3);
 
                         return what.toJson()
                             .then(json => {
