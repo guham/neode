@@ -50,6 +50,16 @@ export default class Collection {
     }
 
     /**
+     * Find value in collection
+     *
+     * @param  {Function} fn
+     * @return {mixed}
+     */
+    find(fn) {
+        return this._values.find(fn);
+    }
+
+    /**
      * Run a function on all values
      * @param  {Function} fn
      * @return {mixed}

@@ -609,7 +609,7 @@ describe('Services/Validator.js', () => {
                     email: {
                         type: 'string',
                         email: {
-                            'tlds.allow': ['com'],
+                            tlds: { allow: true },
                         },
                     },
                 });

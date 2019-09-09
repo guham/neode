@@ -16,9 +16,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 /**
  * Convert a raw property into a JSON friendly format
- * 
+ *
  * @param  {Property}   property
- * @param  {Mixed}      value 
+ * @param  {Mixed}      value
  * @return {Mixed}
  */
 function _valueToJson(property, value) {
@@ -52,15 +52,15 @@ function _valueToJson(property, value) {
 
 /**
  * Convert a property into a cypher value
- * 
- * @param {Property} property 
- * @param {Mixed}    value 
+ *
+ * @param {Property} property
+ * @param {Mixed}    value
  * @return {Mixed}
  */
 exports.valueToJson = _valueToJson;
 function valueToCypher(property, value) {
-    if (property.convertToInteger()) {
-        value = (0, _neo4jDriver.int)(value);
+    if (property.convertToInteger() && value !== null && value !== undefined) {
+        value = _neo4jDriver.v1.int(value);
     }
 
     return value;
@@ -86,7 +86,7 @@ var Entity = function () {
 
         /**
          * Return internal ID as a Neo4j Integer
-         * 
+         *
          * @return {Integer}
          */
 
@@ -98,7 +98,7 @@ var Entity = function () {
 
         /**
          * Return the Node's properties as an Object
-         * 
+         *
          * @return {Object}
          */
 
@@ -139,17 +139,17 @@ var Entity = function () {
             }
             // If property has been set in eager, return that
             else if (this._eager && this._eager.has(property)) {
-                    return this._eager.get(property);
-                }
+                return this._eager.get(property);
+            }
 
             return or;
         }
 
         /**
          * Convert a raw property into a JSON friendly format
-         * 
+         *
          * @param  {Property}   property
-         * @param  {Mixed}      value 
+         * @param  {Mixed}      value
          * @return {Mixed}
          */
 
