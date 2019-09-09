@@ -1,7 +1,5 @@
-import {assert, expect} from 'chai';
-import Neode from '../src/index';
+import { assert, expect } from 'chai';
 import Schema from '../src/Schema';
-import uuid from 'uuid';
 
 describe('Schema.js', () => {
     const label = 'SchemaThing';
@@ -30,7 +28,7 @@ describe('Schema.js', () => {
     after(() => {
         instance.close();
     });
-   
+
     it('should construct', () => {
         assert.instanceOf(instance.schema, Schema);
         assert.isFunction(instance.schema.install);
@@ -57,24 +55,24 @@ describe('Schema.js', () => {
                     const exists = description.match(will_exist);
 
                     if (unique && unique[2] == label) {
-                        if ( unique[4] == 'id' ) {
+                        if (unique[4] == 'id') {
                             id_unique = true;
                         }
                     }
 
                     if (exists && exists[2] == label) {
-                        if ( exists[4] == 'id' ) {
+                        if (exists[4] == 'id') {
                             id_exists = true;
                         }
-                        else if ( exists[4] == 'name' ) {
+                        else if (exists[4] == 'name') {
                             name_exists = true;
                         }
                     }
-                })
+                });
 
                 // Assertions
                 expect(id_unique).to.equal(true);
-                
+
                 // Enterprise?
                 if (instance.enterprise()) {
                     expect(id_exists).to.equal(true);
@@ -88,11 +86,11 @@ describe('Schema.js', () => {
                 };
                 let actual = {};
 
-                const has_index = /INDEX ON :([A-Za-z0-9]+)\(([A-Za-z0-9]+)\)/
+                const has_index = /INDEX ON :([A-Za-z0-9]+)\(([A-Za-z0-9]+)\)/;
 
                 indexes.records.forEach(index => {
                     const description = index.get('description');
-                    const is_indexed =  description.match(has_index);
+                    const is_indexed = description.match(has_index);
 
                     if (is_indexed && is_indexed[1] == label) {
                         actual[is_indexed[2]] = true;
@@ -104,7 +102,7 @@ describe('Schema.js', () => {
             .then(() => done())
             .catch(e => {
                 done(e);
-            })
+            });
     });
 
     it('should drop the schema', (done) => {
@@ -126,20 +124,20 @@ describe('Schema.js', () => {
                     const exists = description.match(will_exist);
 
                     if (unique && unique[2] == label) {
-                        if ( unique[4] == 'id' ) {
+                        if (unique[4] == 'id') {
                             id_unique = true;
                         }
                     }
 
                     if (exists && exists[2] == label) {
-                        if ( exists[4] == 'id' ) {
+                        if (exists[4] == 'id') {
                             id_exists = true;
                         }
-                        else if ( exists[4] == 'name' ) {
+                        else if (exists[4] == 'name') {
                             name_exists = true;
                         }
                     }
-                })
+                });
 
                 // Assertions
                 expect(id_unique).to.equal(false);
@@ -157,11 +155,11 @@ describe('Schema.js', () => {
                 };
                 let actual = {};
 
-                const has_index = /INDEX ON :([A-Za-z0-9]+)\(([A-Za-z0-9]+)\)/
+                const has_index = /INDEX ON :([A-Za-z0-9]+)\(([A-Za-z0-9]+)\)/;
 
                 indexes.records.forEach(index => {
                     const description = index.get('description');
-                    const is_indexed =  description.match(has_index);
+                    const is_indexed = description.match(has_index);
 
                     if (is_indexed && is_indexed[1] == label) {
                         actual[is_indexed[2]] = true;
@@ -171,7 +169,7 @@ describe('Schema.js', () => {
                 expect(actual).to.not.include(unexpected);
             })
             .then(() => done())
-            .catch(e => done(e))
+            .catch(e => done(e));
     });
 
 });

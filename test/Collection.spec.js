@@ -1,5 +1,4 @@
-import {assert, expect} from 'chai';
-import Node from '../src/Node';
+import { expect } from 'chai';
 import Collection from '../src/Collection';
 
 describe('Collection.js', () => {
@@ -30,8 +29,8 @@ describe('Collection.js', () => {
     describe('::get', () => {
         it('should get an item from the internal values', () => {
             values.forEach((value, index) => {
-                expect( collection.get(index) ).to.equal(value);
-            })
+                expect(collection.get(index)).to.equal(value);
+            });
         });
     });
 

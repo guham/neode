@@ -1,9 +1,7 @@
-import {assert, expect} from 'chai';
+import { expect } from 'chai';
 import FindAll from '../../src/Services/FindAll';
 import Create from '../../src/Services/Create';
 import Node from '../../src/Node';
-
-const TIMEOUT = 10000;
 
 describe('Services/FindAll.js', () => {
     let instance;
@@ -24,7 +22,6 @@ describe('Services/FindAll.js', () => {
             relationship: 'RELATIONSHIP_TO_MODEL',
             target: label,
             direction: 'out',
-            properties: {},
             alias: 'node',
             properties: {
                 since: {
@@ -37,7 +34,6 @@ describe('Services/FindAll.js', () => {
             type: 'relationship',
             relationship: 'RELATIONSHIP_TO_MODEL',
             direction: 'out',
-            properties: {},
             eager: true,
             alias: 'node',
             properties: {
@@ -45,7 +41,7 @@ describe('Services/FindAll.js', () => {
                     type: 'int',
                     default: Date.now
                 }
-            }, 
+            },
         },
         forArray: {
             type: 'node',
@@ -62,7 +58,7 @@ describe('Services/FindAll.js', () => {
         },
         arrayOfRelationships: {
             type: 'nodes',
-            relationship: [ 'RELATIONSHIP_TO_MODEL', 'FOR_ARRAY' ],
+            relationship: ['RELATIONSHIP_TO_MODEL', 'FOR_ARRAY'],
             direction: 'out',
             eager: true,
         },
@@ -98,7 +94,7 @@ describe('Services/FindAll.js', () => {
                 name: 'For Array'
             },
         })
-            .then(res => {
+            .then(() => {
                 return FindAll(instance, model, { name })
                     .then(collection => {
                         expect(collection.length).to.equal(1);
@@ -109,9 +105,9 @@ describe('Services/FindAll.js', () => {
                         expect(first.get('name')).to.equal(name);
 
                         // Eager
-                        expect( first._eager.get('nodeToAnything').get('name') ).to.equal(eager_name);
-                        expect( first._eager.get('relationshipToAnything').otherNode().get('name') ).to.equal(eager_name);
-                        expect( first._eager.get('arrayOfRelationships').length ).to.equal(2);
+                        expect(first._eager.get('nodeToAnything').get('name')).to.equal(eager_name);
+                        expect(first._eager.get('relationshipToAnything').otherNode().get('name')).to.equal(eager_name);
+                        expect(first._eager.get('arrayOfRelationships').length).to.equal(2);
                     });
             })
             .then(() => done())
@@ -124,17 +120,17 @@ describe('Services/FindAll.js', () => {
             instance.create(label, { name: '300' }),
             instance.create(label, { name: '150' }),
         ])
-        .then(() => {
-            return FindAll(instance, model, {}, 'name')
-                .then(res => {
-                    const actual = res.map(r => r.get('name'));
-                    const expected = [ '100', '150', '300' ];
+            .then(() => {
+                return FindAll(instance, model, {}, 'name')
+                    .then(res => {
+                        const actual = res.map(r => r.get('name'));
+                        const expected = ['100', '150', '300'];
 
-                    expect( actual ).to.deep.equal( expected );
-                })
-                .then(() => done())
-                .catch(e => done(e));;
-        });
+                        expect(actual).to.deep.equal(expected);
+                    })
+                    .then(() => done())
+                    .catch(e => done(e));
+            });
     });
 
     it('should apply the alias to a map of orders', done => {
@@ -143,17 +139,17 @@ describe('Services/FindAll.js', () => {
             instance.create(label, { name: '300' }),
             instance.create(label, { name: '150' }),
         ])
-        .then(() => {
-            return FindAll(instance, model, {}, { name: 'DESC' })
-                .then(res => {
-                    const actual = res.map(r => r.get('name'));
-                    const expected = [ '300', '150', '100' ];
+            .then(() => {
+                return FindAll(instance, model, {}, { name: 'DESC' })
+                    .then(res => {
+                        const actual = res.map(r => r.get('name'));
+                        const expected = ['300', '150', '100'];
 
-                    expect( actual ).to.deep.equal( expected );
-                });
-        })
-        .then(() => done())
-        .catch(e => done(e));
+                        expect(actual).to.deep.equal(expected);
+                    });
+            })
+            .then(() => done())
+            .catch(e => done(e));
     });
 
 });

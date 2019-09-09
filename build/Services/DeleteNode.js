@@ -10,8 +10,6 @@ var _Builder = require('../Query/Builder');
 
 var _Builder2 = _interopRequireDefault(_Builder);
 
-var _Factory = require('../Factory');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MAX_EAGER_DEPTH = exports.MAX_EAGER_DEPTH = 10;
@@ -88,9 +86,7 @@ function DeleteNode(neode, identity, model) {
     var to_depth = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : MAX_EAGER_DEPTH;
 
     var alias = 'this';
-    var to_delete = [];
     var aliases = [alias];
-    var depth = 1;
 
     var builder = new _Builder2.default(neode).match(alias, model).whereId(alias, identity);
 

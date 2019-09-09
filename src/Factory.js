@@ -1,7 +1,7 @@
 import Collection from './Collection';
 import Node from './Node';
 import Relationship from './Relationship';
-import { v1 as neo4j } from 'neo4j-driver';
+import { isInt } from 'neo4j-driver';
 
 import { EAGER_ID, EAGER_LABELS, EAGER_TYPE, } from './Query/EagerUtils';
 import { DIRECTION_IN, } from './RelationshipType';
@@ -25,11 +25,11 @@ export default class Factory {
      * @return {Node}
      */
     hydrateFirst(res, alias, definition) {
-        if ( !res || !res.records.length ) {
+        if (!res || !res.records.length) {
             return false;
         }
 
-        return this.hydrateNode( res.records[0].get(alias), definition );
+        return this.hydrateNode(res.records[0].get(alias), definition);
     }
 
     /**
@@ -42,11 +42,11 @@ export default class Factory {
      */
 
     hydrate(res, alias, definition) {
-        if ( !res ) {
+        if (!res) {
             return false;
         }
 
-        const nodes = res.records.map( row => this.hydrateNode(row.get(alias), definition) );
+        const nodes = res.records.map(row => this.hydrateNode(row.get(alias), definition));
 
         return new Collection(this._neode, nodes);
     }
@@ -70,7 +70,7 @@ export default class Factory {
      */
     hydrateNode(record, definition) {
         // Is there no better way to check this?!
-        if ( neo4j.isInt( record.identity ) && Array.isArray( record.labels ) ) {
+        if (isInt(record.identity) && Array.isArray(record.labels)) {
             record = Object.assign({}, record.properties, {
                 [EAGER_ID]: record.identity,
                 [EAGER_LABELS]: record.labels,
@@ -78,11 +78,11 @@ export default class Factory {
         }
 
         // Get Internals
-        const identity = record[ EAGER_ID ];
-        const labels = record[ EAGER_LABELS ];
-        
+        const identity = record[EAGER_ID];
+        const labels = record[EAGER_LABELS];
+
         // Get Definition from 
-        if ( !definition ) {
+        if (!definition) {
             definition = this.getDefinition(labels);
         }
 
@@ -90,8 +90,8 @@ export default class Factory {
         const properties = new Map;
 
         definition.properties().forEach((value, key) => {
-            if ( record.hasOwnProperty(key) ) {
-                properties.set(key, record[ key ]);
+            if (record.hasOwnProperty(key)) {
+                properties.set(key, record[key]);
             }
         });
 
@@ -102,25 +102,25 @@ export default class Factory {
         definition.eager().forEach(eager => {
             const name = eager.name();
 
-            if ( !record[ name ] ) {
+            if (!record[name]) {
                 return;
             }
 
-            switch ( eager.type() ) {
+            switch (eager.type()) {
                 case 'node':
-                    node.setEager(name, this.hydrateNode(record[ name ]) );
+                    node.setEager(name, this.hydrateNode(record[name]));
                     break;
 
                 case 'nodes':
-                    node.setEager( name, new Collection(this._neode, record[ name ].map(value => this.hydrateNode(value))) );
+                    node.setEager(name, new Collection(this._neode, record[name].map(value => this.hydrateNode(value))));
                     break;
 
                 case 'relationship':
-                    node.setEager( name, this.hydrateRelationship(eager, record[ name ], node) );
+                    node.setEager(name, this.hydrateRelationship(eager, record[name], node));
                     break;
 
                 case 'relationships':
-                    node.setEager( name, new Collection(this._neode, record[ name ].map(value => this.hydrateRelationship(eager, value, node))) );
+                    node.setEager(name, new Collection(this._neode, record[name].map(value => this.hydrateRelationship(eager, value, node))));
                     break;
             }
         });
@@ -138,8 +138,8 @@ export default class Factory {
      */
     hydrateRelationship(definition, record, this_node) {
         // Get Internals
-        const identity = record[ EAGER_ID ];
-        const type = record[ EAGER_TYPE ];
+        const identity = record[EAGER_ID];
+        const type = record[EAGER_TYPE];
 
         // Get Definition from 
         // const definition = this.getDefinition(labels);
@@ -148,18 +148,18 @@ export default class Factory {
         const properties = new Map;
 
         definition.properties().forEach((value, key) => {
-            if ( record.hasOwnProperty(key) ) {
-                properties.set(key, record[ key ]);
+            if (record.hasOwnProperty(key)) {
+                properties.set(key, record[key]);
             }
         });
 
         // Start & End Nodes
-        const other_node = this.hydrateNode( record[ definition.nodeAlias() ] );
+        const other_node = this.hydrateNode(record[definition.nodeAlias()]);
 
         // Calculate Start & End Nodes
         const start_node = definition.direction() == DIRECTION_IN
-            ? other_node: this_node;
-            
+            ? other_node : this_node;
+
         const end_node = definition.direction() == DIRECTION_IN
             ? this_node : other_node;
 

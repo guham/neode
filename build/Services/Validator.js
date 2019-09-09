@@ -24,10 +24,6 @@ var _RelationshipType = require('../RelationshipType');
 
 var _RelationshipType2 = _interopRequireDefault(_RelationshipType);
 
-var _ValidationError = require('../ValidationError');
-
-var _ValidationError2 = _interopRequireDefault(_ValidationError);
-
 var _neo4jDriver = require('neo4j-driver');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -141,28 +137,29 @@ function BuildValidationSchema(schema) {
                 break;
 
             case 'datetime':
-                validation = temporal.temporal().type(_neo4jDriver.v1.types.DateTime);
+                validation = temporal.temporal().type(_neo4jDriver.types.DateTime);
                 break;
 
             case 'date':
-                validation = temporal.temporal().type(_neo4jDriver.v1.types.Date);
+                validation = temporal.temporal().type(_neo4jDriver.types.Date);
                 break;
 
             case 'time':
-                validation = temporal.temporal().type(_neo4jDriver.v1.types.Time);
+                validation = temporal.temporal().type(_neo4jDriver.types.Time);
                 break;
 
             case 'localdate':
-                validation = temporal.temporal().type(_neo4jDriver.v1.types.LocalDate);
+                validation = temporal.temporal().type(_neo4jDriver.types.LocalDate);
                 break;
 
             case 'localtime':
-                validation = temporal.temporal().type(_neo4jDriver.v1.types.LocalTime);
+                validation = temporal.temporal().type(_neo4jDriver.types.LocalTime);
                 break;
 
             case 'int':
             case 'integer':
-                validation = _joi2.default.number().integer();
+                // todo: Joi.object() or Joi.number()
+                validation = _joi2.default.any();
                 break;
 
             case 'float':

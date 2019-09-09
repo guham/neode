@@ -3,7 +3,7 @@ import Joi from '@hapi/joi';
 import Model from '../Model';
 import Node from '../Node';
 import RelationshipType, { DEFAULT_ALIAS } from '../RelationshipType';
-import { v1 as neo4j } from 'neo4j-driver';
+import { types } from 'neo4j-driver';
 
 const joi_options = {
     allowUnknown: true,
@@ -158,23 +158,23 @@ function BuildValidationSchema(schema) {
                 break;
 
             case 'datetime':
-                validation = temporal.temporal().type(neo4j.types.DateTime);
+                validation = temporal.temporal().type(types.DateTime);
                 break;
 
             case 'date':
-                validation = temporal.temporal().type(neo4j.types.Date);
+                validation = temporal.temporal().type(types.Date);
                 break;
 
             case 'time':
-                validation = temporal.temporal().type(neo4j.types.Time);
+                validation = temporal.temporal().type(types.Time);
                 break;
 
             case 'localdate':
-                validation = temporal.temporal().type(neo4j.types.LocalDate);
+                validation = temporal.temporal().type(types.LocalDate);
                 break;
 
             case 'localtime':
-                validation = temporal.temporal().type(neo4j.types.LocalTime);
+                validation = temporal.temporal().type(types.LocalTime);
                 break;
 
             case 'int':

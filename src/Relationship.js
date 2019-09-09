@@ -67,7 +67,7 @@ export default class Relationship extends Entity {
      * (ie if direction is in, get the end node, otherwise get the start node)
      */
     otherNode() {
-        return this._definition.direction() == DIRECTION_IN 
+        return this._definition.direction() == DIRECTION_IN
             ? this.startNode()
             : this.endNode();
     }
@@ -87,19 +87,19 @@ export default class Relationship extends Entity {
 
         // Properties
         definition.properties().forEach((property, key) => {
-            if ( property.hidden() ) {
+            if (property.hidden()) {
                 return;
             }
 
-            if ( this._properties.has(key) ) {
-                output[ key ] = this.valueToJson(property, this._properties.get( key ));
+            if (this._properties.has(key)) {
+                output[key] = this.valueToJson(property, this._properties.get(key));
             }
         });
 
         // Get Other Node
         return this.otherNode().toJson()
             .then(json => {
-                output[ definition.nodeAlias() ] = json;
+                output[definition.nodeAlias()] = json;
 
                 return output;
             });
@@ -114,8 +114,8 @@ export default class Relationship extends Entity {
     update(properties) {
         return UpdateRelationship(this._neode, this._definition, this._identity, properties)
             .then(properties => {
-                Object.entries(properties).forEach(( [key, value] ) => {
-                    this._properties.set( key, value );
+                Object.entries(properties).forEach(([key, value]) => {
+                    this._properties.set(key, value);
                 });
             })
             .then(() => {

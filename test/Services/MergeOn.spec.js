@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import {assert, expect} from 'chai';
+import { assert, expect } from 'chai';
 import MergeOn from '../../src/Services/MergeOn';
 import Node from '../../src/Node';
 
@@ -27,7 +27,6 @@ describe('Services/MergeOn.js', () => {
             relationship: 'RELATIONSHIP',
             target: label,
             direction: 'out',
-            properties: {},
             eager: true,
             alias: 'otherEnd',
             properties: {
@@ -42,7 +41,6 @@ describe('Services/MergeOn.js', () => {
             relationship: 'THEN_TO',
             target: label,
             direction: 'out',
-            properties: {},
             eager: true,
             alias: 'leaf',
             properties: {
@@ -91,7 +89,7 @@ describe('Services/MergeOn.js', () => {
             type: 'node',
             relationship: 'AMBIGUOUS_RELATIONSHIP',
             direction: 'out',
-            target: [ label, 'Person', 'Thing' ],
+            target: [label, 'Person', 'Thing'],
         }
     };
     const merge_on = ['name'];
@@ -104,7 +102,7 @@ describe('Services/MergeOn.js', () => {
     after(done => {
         instance.deleteAll(label)
             .then(() => {
-                return instance.close()
+                return instance.close();
             })
             .then(() => done());
     });
@@ -116,7 +114,7 @@ describe('Services/MergeOn.js', () => {
                     .then(() => {
                         assert(false, 'Error should be thrown');
                     })
-                    .catch(e => {
+                    .catch(() => {
                         assert(true);
 
                         done();
@@ -124,7 +122,7 @@ describe('Services/MergeOn.js', () => {
             }).timeout(TIMEOUT);
 
             it('should perform validation', done => {
-                MergeOn(instance, model, merge_on, {name: 'al'})
+                MergeOn(instance, model, merge_on, { name: 'al' })
                     .then(() => {
                         assert(false, 'Error should be thrown');
                     })
@@ -146,11 +144,11 @@ describe('Services/MergeOn.js', () => {
                     .then(res => {
                         expect(res).to.be.an.instanceOf(Node);
 
-                        expect( res.get('name') ).to.equal(data.name);
-                        expect( res.get('age').toInt()) .to.equal(data.age);
-                        expect( res.get('boolean')) .to.equal(data.boolean);
+                        expect(res.get('name')).to.equal(data.name);
+                        expect(res.get('age').toInt()).to.equal(data.age);
+                        expect(res.get('boolean')).to.equal(data.boolean);
 
-                        assert( res.get('uuid').match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i) )
+                        assert(res.get('uuid').match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i));
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -162,10 +160,10 @@ describe('Services/MergeOn.js', () => {
                 MergeOn(instance, model, merge_on, { name })
                     .then(first => {
                         return MergeOn(instance, model, merge_on, { name })
-                            .then(second => [ first, second ])
+                            .then(second => [first, second]);
                     })
-                    .then(( [first, second] ) => {
-                        expect( first.id() ).to.equal( second.id() );
+                    .then(([first, second]) => {
+                        expect(first.id()).to.equal(second.id());
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -183,12 +181,12 @@ describe('Services/MergeOn.js', () => {
                             node: end_node
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('node').get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('node').get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
-                    })
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -200,12 +198,12 @@ describe('Services/MergeOn.js', () => {
                             name: 'Start node 2',
                             node: end_node.get('uuid'),
                         })
-                        .then(res => {
-                            expect( res.get('name') ).to.equal('Start node 2');
-                            expect( res.get('node').get('name') ).to.equal(name)
-                        })
-                        .then(() => done())
-                        .catch(e => done(e));
+                            .then(res => {
+                                expect(res.get('name')).to.equal('Start node 2');
+                                expect(res.get('node').get('name')).to.equal(name);
+                            })
+                            .then(() => done())
+                            .catch(e => done(e));
                     });
             }).timeout(TIMEOUT);
 
@@ -219,8 +217,8 @@ describe('Services/MergeOn.js', () => {
 
                 MergeOn(instance, model, merge_on, data)
                     .then(res => {
-                        expect( res.get('name') ).to.equal('Start node 3');
-                        expect( res.get('node').get('name') ).to.equal('End node 3')
+                        expect(res.get('name')).to.equal('Start node 3');
+                        expect(res.get('node').get('name')).to.equal('End node 3');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -235,12 +233,12 @@ describe('Services/MergeOn.js', () => {
                 };
 
                 MergeOn(instance, model, merge_on, data)
-                    .then(res => {
-                        assert(false, 'Should throw an exception')
+                    .then(() => {
+                        assert(false, 'Should throw an exception');
                     })
                     .catch(e => {
                         const expected = 'A target defintion must be defined for relationshipToAnything on model MergeOnTest';
-                        expect( e.message ).to.equal(expected);
+                        expect(e.message).to.equal(expected);
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -258,8 +256,8 @@ describe('Services/MergeOn.js', () => {
                             nodes: [end_node]
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('nodes').first().get('name') ).to.equal(name);
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('nodes').first().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -276,8 +274,8 @@ describe('Services/MergeOn.js', () => {
                             nodes: [end_node.get('uuid')],
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('nodes').first().get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('nodes').first().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -294,8 +292,8 @@ describe('Services/MergeOn.js', () => {
 
                 MergeOn(instance, model, merge_on, data)
                     .then(res => {
-                        expect( res.get('name') ).to.equal('Start');
-                        expect( res.get('nodes').first().get('name') ).to.equal('End')
+                        expect(res.get('name')).to.equal('Start');
+                        expect(res.get('nodes').first().get('name')).to.equal('End');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -314,9 +312,9 @@ describe('Services/MergeOn.js', () => {
 
                 MergeOn(instance, model, merge_on, data)
                     .then(res => {
-                        expect( res.get('name') ).to.equal('Start');
-                        expect( res.get('nodes').first().get('name') ).to.equal('Middle');
-                        expect( res.get('nodes').first().get('nodes').first().get('name') ).to.equal('End');
+                        expect(res.get('name')).to.equal('Start');
+                        expect(res.get('nodes').first().get('name')).to.equal('Middle');
+                        expect(res.get('nodes').first().get('nodes').first().get('name')).to.equal('End');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -337,13 +335,13 @@ describe('Services/MergeOn.js', () => {
                             },
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('relationship').get('since') ).to.equal(100);
-                                expect( res.get('relationship').otherNode().get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('relationship').get('since')).to.equal(100);
+                                expect(res.get('relationship').otherNode().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
-                    })
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -359,9 +357,9 @@ describe('Services/MergeOn.js', () => {
                             },
                         })
                             .then(res => {
-                                expect( res.get('name') ).to.equal('Start');
-                                expect( res.get('relationship').get('since') ).to.equal(200);
-                                expect( res.get('relationship').otherNode().get('name') ).to.equal(name)
+                                expect(res.get('name')).to.equal('Start');
+                                expect(res.get('relationship').get('since')).to.equal(200);
+                                expect(res.get('relationship').otherNode().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -396,11 +394,11 @@ describe('Services/MergeOn.js', () => {
                         const gonna = never.get('relationship').otherNode();
                         const give = never.get('relationship').otherNode().get('relationship').otherNode();
 
-                        expect( never.get('name') ).to.equal('Never');
-                        expect( never.get('relationship').get('since') ).to.equal(300);
-                        expect( gonna.get('name') ).to.equal('gonna');
-                        expect( gonna.get('relationship').get('since') ).to.equal(400);
-                        expect( give.get('name') ).to.equal('give');
+                        expect(never.get('name')).to.equal('Never');
+                        expect(never.get('relationship').get('since')).to.equal(300);
+                        expect(gonna.get('name')).to.equal('gonna');
+                        expect(gonna.get('relationship').get('since')).to.equal(400);
+                        expect(give.get('name')).to.equal('give');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -417,12 +415,12 @@ describe('Services/MergeOn.js', () => {
                 };
 
                 MergeOn(instance, model, merge_on, data)
-                    .then(res => {
-                        assert(false, 'Should throw an exception')
+                    .then(() => {
+                        assert(false, 'Should throw an exception');
                     })
                     .catch(e => {
                         const expected = 'You cannot create a node with the ambiguous relationship: ambiguousRelationship on model MergeOnTest';
-                        expect( e.message ).to.equal(expected);
+                        expect(e.message).to.equal(expected);
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -442,14 +440,14 @@ describe('Services/MergeOn.js', () => {
                                 otherEnd: end_node
                             }]
                         })
-                        .then(res => {
-                            expect( res.get('name') ).to.equal('Rel Start 1');
-                            expect( res.get('relationships').first().get('since') ).to.equal(100);
-                            expect( res.get('relationships').first().otherNode().get('name') ).to.equal(name);
-                        })
-                        .then(() => done())
-                        .catch(e => done(e));
-                    })
+                            .then(res => {
+                                expect(res.get('name')).to.equal('Rel Start 1');
+                                expect(res.get('relationships').first().get('since')).to.equal(100);
+                                expect(res.get('relationships').first().otherNode().get('name')).to.equal(name);
+                            })
+                            .then(() => done())
+                            .catch(e => done(e));
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -464,13 +462,13 @@ describe('Services/MergeOn.js', () => {
                                 otherEnd: end_node.get('uuid'),
                             },
                         })
-                        .then(res => {
-                            expect( res.get('name') ).to.equal('Rel Start 2');
-                            expect( res.get('relationships').first().get('since') ).to.equal(100);
-                            expect( res.get('relationships').first().otherNode().get('name') ).to.equal(name);
-                        })
-                        .then(() => done())
-                        .catch(e => done(e));
+                            .then(res => {
+                                expect(res.get('name')).to.equal('Rel Start 2');
+                                expect(res.get('relationships').first().get('since')).to.equal(100);
+                                expect(res.get('relationships').first().otherNode().get('name')).to.equal(name);
+                            })
+                            .then(() => done())
+                            .catch(e => done(e));
                     });
             }).timeout(TIMEOUT);
 
@@ -482,9 +480,9 @@ describe('Services/MergeOn.js', () => {
                         otherEnd: {
                             name: 'gonna',
                             relationships: [
-                                { since: 100, otherEnd: {name: 'give you up' }},
-                                { since: 200, otherEnd: {name: 'let you down' }},
-                                { since: 300, otherEnd: {name: 'run around and desert you' }},
+                                { since: 100, otherEnd: { name: 'give you up' } },
+                                { since: 200, otherEnd: { name: 'let you down' } },
+                                { since: 300, otherEnd: { name: 'run around and desert you' } },
                             ],
                         },
                     }],
@@ -494,13 +492,13 @@ describe('Services/MergeOn.js', () => {
                     .then(never => {
                         const gonna = never.get('relationship').otherNode();
 
-                        expect( never.get('name') ).to.equal('Never');
-                        expect( never.get('relationships').first().get('since') ).to.equal(300);
-                        expect( gonna.get('name') ).to.equal('gonna');
+                        expect(never.get('name')).to.equal('Never');
+                        expect(never.get('relationships').first().get('since')).to.equal(300);
+                        expect(gonna.get('name')).to.equal('gonna');
 
                         const what = gonna.get('relationships');
 
-                        expect( what.length ).to.equal(3);
+                        expect(what.length).to.equal(3);
 
                         return what.toJson()
                             .then(json => {

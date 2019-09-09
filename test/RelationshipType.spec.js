@@ -1,13 +1,9 @@
 import RelationshipType, { DIRECTION_IN, DIRECTION_OUT } from '../src/RelationshipType';
 import Property from '../src/Property';
 import Model from '../src/Model';
-import {assert, expect} from 'chai';
+import { expect } from 'chai';
 
 describe('RelationshipType.js', () => {
-    let instance;
-    let model;
-
-
     it('should construct', () => {
         const name = 'test';
         const type = 'relationships';

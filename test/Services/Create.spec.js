@@ -107,7 +107,7 @@ describe('Services/Create.js', () => {
     after(done => {
         instance.deleteAll(label)
             .then(() => {
-                return instance.close()
+                return instance.close();
             })
             .then(() => done());
     });
@@ -159,11 +159,11 @@ describe('Services/Create.js', () => {
                         })
                             .then(res => {
                                 expect(res.get('name')).to.equal('Start');
-                                expect(res.get('node').get('name')).to.equal(name)
+                                expect(res.get('node').get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
-                    })
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -177,7 +177,7 @@ describe('Services/Create.js', () => {
                         })
                             .then(res => {
                                 expect(res.get('name')).to.equal('Start');
-                                expect(res.get('node').get('name')).to.equal(name)
+                                expect(res.get('node').get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -195,7 +195,7 @@ describe('Services/Create.js', () => {
                 Create(instance, model, data)
                     .then(res => {
                         expect(res.get('name')).to.equal('Start');
-                        expect(res.get('node').get('name')).to.equal('End')
+                        expect(res.get('node').get('name')).to.equal('End');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -210,8 +210,8 @@ describe('Services/Create.js', () => {
                 };
 
                 Create(instance, model, data)
-                    .then(res => {
-                        assert(false, 'Should throw an exception')
+                    .then(() => {
+                        assert(false, 'Should throw an exception');
                     })
                     .catch(e => {
                         const expected = 'A target defintion must be defined for relationshipToAnything on model CreateTest';
@@ -234,11 +234,11 @@ describe('Services/Create.js', () => {
                         })
                             .then(res => {
                                 expect(res.get('name')).to.equal('Start');
-                                expect(res.get('nodes').first().get('name')).to.equal(name)
+                                expect(res.get('nodes').first().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
-                    })
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -252,7 +252,7 @@ describe('Services/Create.js', () => {
                         })
                             .then(res => {
                                 expect(res.get('name')).to.equal('Start');
-                                expect(res.get('nodes').first().get('name')).to.equal(name)
+                                expect(res.get('nodes').first().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -270,7 +270,7 @@ describe('Services/Create.js', () => {
                 Create(instance, model, data)
                     .then(res => {
                         expect(res.get('name')).to.equal('Start');
-                        expect(res.get('nodes').first().get('name')).to.equal('End')
+                        expect(res.get('nodes').first().get('name')).to.equal('End');
                     })
                     .then(() => done())
                     .catch(e => done(e));
@@ -318,7 +318,7 @@ describe('Services/Create.js', () => {
                             })
                             .then(() => done())
                             .catch(e => done(e));
-                    })
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -336,7 +336,7 @@ describe('Services/Create.js', () => {
                             .then(res => {
                                 expect(res.get('name')).to.equal('Start');
                                 expect(res.get('relationship').get('since')).to.equal(200);
-                                expect(res.get('relationship').otherNode().get('name')).to.equal(name)
+                                expect(res.get('relationship').otherNode().get('name')).to.equal(name);
                             })
                             .then(() => done())
                             .catch(e => done(e));
@@ -392,7 +392,7 @@ describe('Services/Create.js', () => {
                 };
 
                 Create(instance, model, data)
-                    .then(res => {
+                    .then(() => {
                         assert(false, 'Should throw an exception');
                     })
                     .catch(e => {
@@ -424,7 +424,7 @@ describe('Services/Create.js', () => {
                             })
                             .then(() => done())
                             .catch(e => done(e));
-                    })
+                    });
             }).timeout(TIMEOUT);
 
             it('should create a relationship to a single node by its primary key', done => {
@@ -468,7 +468,6 @@ describe('Services/Create.js', () => {
                 Create(instance, model, data)
                     .then(never => {
                         const gonna = never.get('relationship').otherNode();
-                        const give = never.get('relationship').otherNode().get('relationship').otherNode();
 
                         expect(never.get('name')).to.equal('Never');
                         expect(never.get('relationships').first().get('since')).to.equal(300);

@@ -1,4 +1,4 @@
-import {assert, expect} from 'chai';
+import { expect } from 'chai';
 import GenerateDefaultValues from '../../src/Services/GenerateDefaultValues';
 
 describe('Services/GenerateDefaultValues.js', () => {
@@ -37,10 +37,10 @@ describe('Services/GenerateDefaultValues.js', () => {
 
                 done(new Error('Error not thrown'));
             }
-            catch(e) {
+            catch (e) {
                 done();
             }
-        })
+        });
 
         it('should not treat 0 as a null value', done => {
             const input = { someNumber: 0 };

@@ -7,7 +7,7 @@ function createInstance() {
 module.exports = createInstance;
 
 
-    /** Testing * /
+/** Testing * /
     before(done => {
         instance = require('../instance')();
         model = instance.model(label, schema);

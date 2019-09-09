@@ -1,16 +1,25 @@
-parserOptions:
-  sourceType: module
-rules:
-  strict:
-    - 1
-  indent:
-    - 2
-    - 4
-    - SwitchCase: 1
-  semi:
-    - error
-    - always
-env:
-  es6: true
-  node: true
-extends: 'eslint:recommended'
+{
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "strict": "warn",
+    "semi": [
+      "error",
+      "always"
+    ],
+    "indent": [
+      "error",
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ],
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "mocha": true,
+  },
+}

@@ -283,13 +283,18 @@ var Neode = function () {
          *
          * @param  {String} query
          * @param  {Object} params
+         * @param  {Object} param The object parameter
          * @return {Promise}
          */
 
     }, {
         key: 'readCypher',
         value: function readCypher(query, params) {
-            var session = this.readSession();
+            var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+                _ref$database = _ref.database,
+                database = _ref$database === undefined ? '' : _ref$database;
+
+            var session = this.readSession({ database: database });
 
             return this.cypher(query, params, session);
         }
@@ -299,13 +304,18 @@ var Neode = function () {
          *
          * @param  {String} query
          * @param  {Object} params
+         * @param  {Object} param The object parameter
          * @return {Promise}
          */
 
     }, {
         key: 'writeCypher',
         value: function writeCypher(query, params) {
-            var session = this.writeSession();
+            var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+                _ref2$database = _ref2.database,
+                database = _ref2$database === undefined ? '' : _ref2$database;
+
+            var session = this.writeSession({ database: database });
 
             return this.cypher(query, params, session);
         }
@@ -315,6 +325,8 @@ var Neode = function () {
          *
          * @param  {String} query
          * @param  {Object} params
+         * @param  {Session} session
+         * @param  {Object} param The object parameter
          * @return {Promise}
          */
 
@@ -323,22 +335,21 @@ var Neode = function () {
         value: function cypher(query, params) {
             var session = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-            // If single run, open a new session
-            var single = !session;
-            if (single) {
-                session = this.session();
+            var _ref3 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
+                _ref3$database = _ref3.database,
+                database = _ref3$database === undefined ? '' : _ref3$database;
+
+            if (!session) {
+                // create a new session with read mode
+                session = this.session({ database: database });
             }
 
             return session.run(query, params).then(function (res) {
-                if (single) {
-                    session.close();
-                }
+                session.close();
 
                 return res;
             }).catch(function (err) {
-                if (single) {
-                    session.close();
-                }
+                session.close();
 
                 err.query = query;
                 err.params = params;
@@ -350,52 +361,72 @@ var Neode = function () {
         /**
          * Create a new Session in the Neo4j Driver.
          *
+         * @param  {Object} param The object parameter
          * @return {Session}
          */
 
     }, {
         key: 'session',
         value: function session() {
-            return this.readSession();
+            var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref4$database = _ref4.database,
+                database = _ref4$database === undefined ? '' : _ref4$database;
+
+            return this.readSession({ database: database });
         }
 
         /**
          * Create an explicit Read Session
          *
+         * @param  {Object} param The object parameter
          * @return {Session}
          */
 
     }, {
         key: 'readSession',
         value: function readSession() {
-            return this.driver.session(_neo4jDriver2.default.READ);
+            var _ref5 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref5$database = _ref5.database,
+                database = _ref5$database === undefined ? '' : _ref5$database;
+
+            return this.driver.session({ defaultAccessMode: _neo4jDriver2.default.session.READ, database: database });
         }
 
         /**
          * Create an explicit Write Session
          *
+         * @param  {Object} param The object parameter
          * @return {Session}
          */
 
     }, {
         key: 'writeSession',
         value: function writeSession() {
-            return this.driver.session(_neo4jDriver2.default.WRITE);
+            var _ref6 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref6$database = _ref6.database,
+                database = _ref6$database === undefined ? '' : _ref6$database;
+
+            return this.driver.session({ defaultAccessMode: _neo4jDriver2.default.session.WRITE, database: database });
         }
 
         /**
          * Create a new Transaction
          *
+         * @param  {Object} param The object parameter
          * @return {Transaction}
          */
 
     }, {
         key: 'transaction',
         value: function transaction() {
-            var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _neo4jDriver2.default.WRITE;
+            var _ref7 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref7$defaultAccessMo = _ref7.defaultAccessMode,
+                defaultAccessMode = _ref7$defaultAccessMo === undefined ? _neo4jDriver2.default.session.WRITE : _ref7$defaultAccessMo,
+                _ref7$database = _ref7.database,
+                database = _ref7$database === undefined ? '' : _ref7$database;
 
-            var session = this.driver.session();
-            var tx = session.beginTransaction(mode);
+            var session = this.driver.session({ defaultAccessMode: defaultAccessMode, database: database });
+            var tx = session.beginTransaction();
 
             // Create an 'end' function to commit & close the session
             // TODO: Clean up
@@ -411,14 +442,21 @@ var Neode = function () {
         /**
          * Run a batch of queries within a transaction
          *
-         * @type {Array}
+         * @param {Array} queries
+         * @param  {Object} param The object parameter
          * @return {Promise}
          */
 
     }, {
         key: 'batch',
         value: function batch(queries) {
-            var tx = this.transaction();
+            var _ref8 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+                _ref8$defaultAccessMo = _ref8.defaultAccessMode,
+                defaultAccessMode = _ref8$defaultAccessMo === undefined ? _neo4jDriver2.default.session.WRITE : _ref8$defaultAccessMo,
+                _ref8$database = _ref8.database,
+                database = _ref8$database === undefined ? '' : _ref8$database;
+
+            var tx = this.transaction({ defaultAccessMode: defaultAccessMode, database: database });
             var output = [];
             var errors = [];
 
@@ -453,13 +491,13 @@ var Neode = function () {
         /**
          * Close Driver
          *
-         * @return {void}
+         * @return {Promise}
          */
 
     }, {
         key: 'close',
         value: function close() {
-            this.driver.close();
+            return this.driver.close();
         }
 
         /**

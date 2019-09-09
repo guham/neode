@@ -1,4 +1,4 @@
-import { v1 as neo4j } from 'neo4j-driver';
+import { isDateTime, isPoint } from 'neo4j-driver';
 import Entity from './Entity';
 import UpdateNode from './Services/UpdateNode';
 import DeleteNode from './Services/DeleteNode';
@@ -93,8 +93,8 @@ export default class Node extends Entity {
     relateTo(node, type, properties = {}, force_create = false) {
         const relationship = this._model.relationships().get(type);
 
-        if ( !(relationship instanceof RelationshipType) ) {
-            return Promise.reject( new Error(`Cannot find relationship with type ${type}`) );
+        if (!(relationship instanceof RelationshipType)) {
+            return Promise.reject(new Error(`Cannot find relationship with type ${type}`));
         }
 
         return RelateTo(this._neode, this, node, relationship, properties, force_create)
@@ -118,56 +118,56 @@ export default class Node extends Entity {
 
         // Properties
         this._model.properties().forEach((property, key) => {
-            if ( property.hidden() ) {
+            if (property.hidden()) {
                 return;
             }
 
-            if ( this._properties.has(key) ) {
-                output[ key ] = this.valueToJson(property, this._properties.get( key ));
+            if (this._properties.has(key)) {
+                output[key] = this.valueToJson(property, this._properties.get(key));
             }
-            else if (neo4j.temporal.isDateTime(output[key])) {
+            else if (isDateTime(output[key])) {
                 output[key] = new Date(output[key].toString());
             }
-            else if (neo4j.spatial.isPoint(output[key])) {
+            else if (isPoint(output[key])) {
                 switch (output[key].srid.toString()) {
                     // SRID values: @https://neo4j.com/docs/developer-manual/current/cypher/functions/spatial/
                     case '4326': // WGS 84 2D
-                        output[key] = {longitude: output[key].x, latitude: output[key].y};
+                        output[key] = { longitude: output[key].x, latitude: output[key].y };
                         break;
 
                     case '4979': // WGS 84 3D
-                        output[key] = {longitude: output[key].x, latitude: output[key].y, height: output[key].z};
+                        output[key] = { longitude: output[key].x, latitude: output[key].y, height: output[key].z };
                         break;
 
                     case '7203': // Cartesian 2D
-                        output[key] = {x: output[key].x, y: output[key].y};
+                        output[key] = { x: output[key].x, y: output[key].y };
                         break;
 
                     case '9157': // Cartesian 3D
-                        output[key] = {x: output[key].x, y: output[key].y, z: output[key].z};
+                        output[key] = { x: output[key].x, y: output[key].y, z: output[key].z };
                         break;
                 }
             }
         });
 
         // Eager Promises
-        return Promise.all( this._model.eager().map((rel) => {
+        return Promise.all(this._model.eager().map((rel) => {
             const key = rel.name();
 
-            if ( this._eager.has( rel.name() ) ) {
+            if (this._eager.has(rel.name())) {
                 // Call internal toJson function on either a Node or NodeCollection
-                return this._eager.get( rel.name() ).toJson()
+                return this._eager.get(rel.name()).toJson()
                     .then(value => {
                         return { key, value };
                     });
             }
-        }) )
+        }))
             // Remove Empty
-            .then(eager => eager.filter( e => !!e ))
+            .then(eager => eager.filter(e => !!e))
 
             // Assign to Output
             .then(eager => {
-                eager.forEach(({ key, value }) => output[ key ] = value);
+                eager.forEach(({ key, value }) => output[key] = value);
 
                 return output;
             });
@@ -182,8 +182,8 @@ export default class Node extends Entity {
     update(properties) {
         return UpdateNode(this._neode, this._model, this._identity, properties)
             .then(properties => {
-                Object.entries(properties).forEach(( [key, value] ) => {
-                    this._properties.set( key, value );
+                Object.entries(properties).forEach(([key, value]) => {
+                    this._properties.set(key, value);
                 });
             })
             .then(() => {

@@ -1,4 +1,4 @@
-import {v1 as neo4j} from 'neo4j-driver';
+import * as neo4j from 'neo4j-driver';
 
 declare class Neode {
   schema: Neode.Schema;
@@ -10,9 +10,10 @@ declare class Neode {
    * @param  {String} username
    * @param  {String} password
    * @param  {Bool}   enterprise
+   * @param  {Object} config
    * @return {Neode}
    */
-  constructor(connection_string: string, username: string, password: string, enterprise ?: boolean);
+  constructor(connection_string: string, username: string, password: string, enterprise?: boolean, config?: neo4j.Config);
 
 
   /**
@@ -29,7 +30,7 @@ declare class Neode {
    * @param  {Object} models   Map of models with their schema.  ie {Movie: {...}}
    * @return {Neode}
    */
-  with(models: {[index: string]: Neode.SchemaObject}): Neode;
+  with(models: { [index: string]: Neode.SchemaObject }): Neode;
 
   /**
    * Scan a directory for Models
@@ -124,77 +125,86 @@ declare class Neode {
    * @param  {Boolean} force_create   Force the creation a new relationship? If false, the relationship will be merged
    * @return {Promise}
    */
-  relate<T,U>(from: Neode.Node<T>, to: Neode.Node<U>, type: string, properties: Neode.RelationshipSchema, force_create ?: boolean): Promise<Neode.Relationship>;
+  relate<T, U>(from: Neode.Node<T>, to: Neode.Node<U>, type: string, properties: Neode.RelationshipSchema, force_create?: boolean): Promise<Neode.Relationship>;
 
   /**
    * Run an explicitly defined Read query
    *
    * @param  {String} query
    * @param  {Object} params
+   * @param  {Object} param The object parameter
    * @return {Promise}
    */
-  readCypher(query: string, params: object): Promise<neo4j.StatementResult>;
+  readCypher(query: string, params: object, { database }?: { database?: string }): Promise<neo4j.StatementResult>;
 
   /**
    * Run an explicitly defined Write query
    *
    * @param  {String} query
    * @param  {Object} params
+   * @param  {Object} param The object parameter
    * @return {Promise}
    */
-  writeCypher(query: string, params: object): Promise<neo4j.StatementResult>;
+  writeCypher(query: string, params: object, { database }?: { database?: string }): Promise<neo4j.StatementResult>;
 
   /**
    * Run a Cypher query
    *
    * @param  {String} query
    * @param  {Object} params
+   * @param  {Session} session
+   * @param  {Object} param The object parameter
    * @return {Promise}
    */
-  cypher(query: string, params: object, session?: neo4j.Session): Promise<neo4j.StatementResult>;
+  cypher(query: string, params: object, session?: neo4j.Session, { database }?: { database?: string }): Promise<neo4j.StatementResult>;
 
   /**
    * Create a new Session in the Neo4j Driver.
    *
+   * @param  {Object} param The object parameter
    * @return {Session}
    */
-  session(): neo4j.Session;
+  session({ database }?: { database?: string }): neo4j.Session;
 
   /**
    * Create an explicit Read Session
    *
+   * @param  {Object} param The object parameter
    * @return {Session}
    */
-  readSession(): neo4j.Session;
+  readSession({ database }?: { database?: string }): neo4j.Session;
 
   /**
    * Create an explicit Write Session
    *
+   * @param  {Object} param The object parameter
    * @return {Session}
    */
-  writeSession(): neo4j.Session;
+  writeSession({ database }?: { database?: string }): neo4j.Session;
 
   /**
    * Create a new Transaction
    *
+   * @param  {Object} param The object parameter
    * @return {Transaction}
    */
-  transaction(): neo4j.Transaction;
+  transaction({ defaultAccessMode, database }?: { defaultAccessMode?: neo4j.SessionMode, database?: string }): neo4j.Transaction;
 
   /**
    * Run a batch of queries within a transaction
    *
    * @type {Array}
+   * @param  {Object} param The object parameter
    * @return {Promise}
    */
-  batch(queries?: Array<{query: string | object, params?: object | string}>): Promise<any>;
+  batch(queries?: Array<{ query: string | object, params?: object | string }>, { defaultAccessMode, database }?: { defaultAccessMode?: neo4j.SessionMode, database?: string }): Promise<any>;
 
   /**
    * Close Driver
    *
-   * @return {void}
+   * @return {Promise}
    */
-  close(): void;
+  close(): Promise<void>;
 
   /**
    * Return a new Query Builder
@@ -241,7 +251,7 @@ declare class Neode {
    * @param  {mixed}  value   Value
    * @return {Promise}
    */
-  first<T>(label: string, key: string | {[key: string]: any}, value: any): Promise<Neode.Node<T>>;
+  first<T>(label: string, key: string | { [key: string]: any }, value: any): Promise<Neode.Node<T>>;
 
   /**
    * Hydrate a set of nodes and return a NodeCollection
@@ -275,19 +285,19 @@ declare namespace Neode {
   type RelationshipPropertyTypes = 'relationship' | 'relationships'
   type StringPropertyTypes = 'string' | 'uuid'
   type PropertyTypes = TemporalPropertyTypes | NumberPropertyTypes
-                        | RelationshipPropertyTypes | StringPropertyTypes
-                        | 'boolean' | 'Point';
+    | RelationshipPropertyTypes | StringPropertyTypes
+    | 'boolean' | 'Point';
 
   type Direction = 'direction_in' | 'direction_out' | 'direction_both' | 'in' | 'out';
 
   interface BaseNodeProperties {
-    primary?:   boolean
-    required?:  boolean
-    unique?:    boolean
-    indexed?:   boolean
-    hidden?:    boolean
-    readonly?:  boolean
-    default?:   any
+    primary?: boolean
+    required?: boolean
+    unique?: boolean
+    indexed?: boolean
+    hidden?: boolean
+    readonly?: boolean
+    default?: any
   }
 
   interface BaseNumberNodeProperties extends BaseNodeProperties {
@@ -342,7 +352,7 @@ declare namespace Neode {
 
   interface StringNodeProperties extends BaseNodeProperties {
     type: 'string'
-  
+
     regex: RegExp | {
       pattern: RegExp
       invert: boolean
@@ -415,7 +425,7 @@ declare namespace Neode {
      * Relationship attached properties
      */
     properties?: {
-        [index: string]: PropertyTypes
+      [index: string]: PropertyTypes
     }
   }
 
@@ -431,16 +441,16 @@ declare namespace Neode {
   }
 
   type NodeProperty = PropertyTypes
-                      | NumberNodeProperties | IntNodeProperties | IntegerNodeProperties | FloatNodeProperties
-                      | RelationshipNodeProperties | RelationshipsNodeProperties
-                      | StringNodeProperties | OtherNodeProperties;
+    | NumberNodeProperties | IntNodeProperties | IntegerNodeProperties | FloatNodeProperties
+    | RelationshipNodeProperties | RelationshipsNodeProperties
+    | StringNodeProperties | OtherNodeProperties;
 
   export type SchemaObject = {
-      [index: string]: NodeProperty
+    [index: string]: NodeProperty
   };
 
   export type RelationshipSchema = {
-      [index: string]: BaseRelationshipNodeProperties
+    [index: string]: BaseRelationshipNodeProperties
   };
 
 
@@ -587,7 +597,7 @@ declare namespace Neode {
      * @param  {...String} output References to output
      * @return {Object}           Object containing `query` and `params` property
      */
-    build(): {query: string, params: object};
+    build(): { query: string, params: object };
 
     /**
      * Execute the query
@@ -693,7 +703,7 @@ declare namespace Neode {
      * @param  {Int}                 skip
      * @return {Promise}
      */
-    withinDistance(location_property: string, point: {x: number, y: number, z?: number} | {latitude: number, longitude: number, height?: number}, distance: number, properties?: object, order?: string | Array<any> | object, limit?: number, skip?: number): Promise<NodeCollection>;
+    withinDistance(location_property: string, point: { x: number, y: number, z?: number } | { latitude: number, longitude: number, height?: number }, distance: number, properties?: object, order?: string | Array<any> | object, limit?: number, skip?: number): Promise<NodeCollection>;
   }
 
   class Model<T> extends Queryable<T> {
@@ -718,7 +728,7 @@ declare namespace Neode {
      *
      * @return {Map}
      */
-    properties(): Map<string,any>;
+    properties(): Map<string, any>;
 
     /**
      * Set Labels
@@ -763,7 +773,7 @@ declare namespace Neode {
      *
      * @return {Map}
      */
-    relationships(): Map<string,RelationshipType>;
+    relationships(): Map<string, RelationshipType>;
 
     /**
      * Get relationships defined as Eager relationships
@@ -957,7 +967,7 @@ declare namespace Neode {
      * @param  {Map}   eager  Eagerly loaded values
      * @return {Node}
      */
-    constructor(neode: Neode, model: Model<T>, node: neo4j.Node, eager?: Map<string,NodeCollection>);
+    constructor(neode: Neode, model: Model<T>, node: neo4j.Node, eager?: Map<string, NodeCollection>);
 
     /**
      * Model definition for this node
@@ -987,7 +997,7 @@ declare namespace Neode {
      * @param  {or}     default  Default value to supply if none exists
      * @return {mixed}
      */
-    get<U>(property: string, or ?: U): U;
+    get<U>(property: string, or?: U): U;
 
     /**
      * Get all properties for this node
@@ -1019,7 +1029,7 @@ declare namespace Neode {
      * @param  {Boolean} force_create   Force the creation a new relationship? If false, the relationship will be merged
      * @return {Promise}
      */
-    relateTo(node: Node<any>, type: string, properties ?: object, force_create ?: boolean): Promise<Relationship>;
+    relateTo(node: Node<any>, type: string, properties?: object, force_create?: boolean): Promise<Relationship>;
 
     /**
      * When converting to string, return this model's primary key
@@ -1088,7 +1098,7 @@ declare namespace Neode {
      *
      * @return {Promise}
      */
-    toJson():Promise<object>;
+    toJson(): Promise<object>;
 
   }
 

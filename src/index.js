@@ -234,10 +234,11 @@ export default class Neode {
      *
      * @param  {String} query
      * @param  {Object} params
+     * @param  {Object} param The object parameter
      * @return {Promise}
      */
-    readCypher(query, params) {
-        const session = this.readSession();
+    readCypher(query, params, { database = '' } = {}) {
+        const session = this.readSession({ database });
 
         return this.cypher(query, params, session);
     }
@@ -247,10 +248,11 @@ export default class Neode {
      *
      * @param  {String} query
      * @param  {Object} params
+     * @param  {Object} param The object parameter
      * @return {Promise}
      */
-    writeCypher(query, params) {
-        const session = this.writeSession();
+    writeCypher(query, params, { database = '' } = {}) {
+        const session = this.writeSession({ database });
 
         return this.cypher(query, params, session);
     }
@@ -260,27 +262,24 @@ export default class Neode {
      *
      * @param  {String} query
      * @param  {Object} params
+     * @param  {Session} session
+     * @param  {Object} param The object parameter
      * @return {Promise}
      */
-    cypher(query, params, session = false) {
-        // If single run, open a new session
-        const single = !session;
-        if (single) {
-            session = this.session();
+    cypher(query, params, session = false, { database = '' } = {}) {
+        if (!session) {
+            // create a new session with read mode
+            session = this.session({ database });
         }
 
         return session.run(query, params)
             .then(res => {
-                if (single) {
-                    session.close();
-                }
+                session.close();
 
                 return res;
             })
             .catch(err => {
-                if (single) {
-                    session.close();
-                }
+                session.close();
 
                 err.query = query;
                 err.params = params;
@@ -292,38 +291,42 @@ export default class Neode {
     /**
      * Create a new Session in the Neo4j Driver.
      *
+     * @param  {Object} param The object parameter
      * @return {Session}
      */
-    session() {
-        return this.readSession();
+    session({ database = '' } = {}) {
+        return this.readSession({ database });
     }
 
     /**
      * Create an explicit Read Session
      *
+     * @param  {Object} param The object parameter
      * @return {Session}
      */
-    readSession() {
-        return this.driver.session(neo4j.READ);
+    readSession({ database = '' } = {}) {
+        return this.driver.session({ defaultAccessMode: neo4j.session.READ, database });
     }
 
     /**
      * Create an explicit Write Session
      *
+     * @param  {Object} param The object parameter
      * @return {Session}
      */
-    writeSession() {
-        return this.driver.session(neo4j.WRITE);
+    writeSession({ database = '' } = {}) {
+        return this.driver.session({ defaultAccessMode: neo4j.session.WRITE, database });
     }
 
     /**
      * Create a new Transaction
      *
+     * @param  {Object} param The object parameter
      * @return {Transaction}
      */
-    transaction(mode = neo4j.WRITE) {
-        const session = this.driver.session();
-        const tx = session.beginTransaction(mode);
+    transaction({ defaultAccessMode = neo4j.session.WRITE, database = '' } = {}) {
+        const session = this.driver.session({ defaultAccessMode, database });
+        const tx = session.beginTransaction();
 
         // Create an 'end' function to commit & close the session
         // TODO: Clean up
@@ -340,11 +343,12 @@ export default class Neode {
     /**
      * Run a batch of queries within a transaction
      *
-     * @type {Array}
+     * @param {Array} queries
+     * @param  {Object} param The object parameter
      * @return {Promise}
      */
-    batch(queries) {
-        const tx = this.transaction();
+    batch(queries, { defaultAccessMode = neo4j.session.WRITE, database = '' } = {}) {
+        const tx = this.transaction({ defaultAccessMode, database });
         const output = [];
         const errors = [];
 
@@ -384,10 +388,10 @@ export default class Neode {
     /**
      * Close Driver
      *
-     * @return {void}
+     * @return {Promise}
      */
     close() {
-        this.driver.close();
+        return this.driver.close();
     }
 
     /**
